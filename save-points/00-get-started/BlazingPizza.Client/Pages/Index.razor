@@ -1,3 +1,33 @@
 ﻿@page "/"
+@inject HttpClient Http;
 
-<h1>Blazing Pizzas</h1>
+<div class="main">
+    <ul class="pizza-cards">
+        @foreach (var special in specials)
+        {
+            <li style="background-image: url('@special.ImageUrl')">
+                <div class="pizza-info">
+                    <span class="title">
+                        @special.Name
+                    </span>
+                    @special.Description
+                    <span class="price">
+                        @special.GetFormattedBasePrice()
+                    </span>
+                </div>
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+    List<PizzaSpecial> specials;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // The /specials API is defined by a minimal API at PizzaApiExtensions.cs in the BlazingPizza.Server project.
+        // BlazingPizza.OrderContext.Default.ListPizzaSpecial refers to Json serialization with source generators.
+        // See here: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-source-generation
+        specials = await Http.GetFromJsonAsync<List<PizzaSpecial>>("specials", BlazingPizza.OrderContext.Default.ListPizzaSpecial);
+    }
+}
