@@ -1,0 +1,29 @@
+@page "/MyOrders"
+@inject HttpClient Http
+
+<PageTitle>Blazing Pizza - My Orders</PageTitle>
+
+<div class="main">
+  @if (_ordersWithStatus == null)
+  {
+    <div>Loading...</div>
+  } 
+  else if (!_ordersWithStatus.Any())
+  {
+    <h2>No orders placed</h2>
+    <a class="btn btn-success" href="">Order some pizza</a>
+  }
+  else
+  {
+    <div>TODO: show orders</div>
+  }
+</div>
+
+@code {
+  IEnumerable<OrderWithStatus> _ordersWithStatus;
+
+  protected override async Task OnParametersSetAsync()
+  {
+    _ordersWithStatus = await Http.GetFromJsonAsync<List<OrderWithStatus>>("orders");
+  }
+}
