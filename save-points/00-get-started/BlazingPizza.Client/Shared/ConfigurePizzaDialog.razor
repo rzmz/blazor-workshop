@@ -1,5 +1,4 @@
 ﻿@inject HttpClient Http
-@inject IJSRuntime JSRuntime
 
 <div class="dialog-container" tabindex="0" @onkeydown="KeyDown" @ref="_configurePizzaDialog">
     <div class="dialog">
@@ -75,7 +74,7 @@
   {
     if (firstRender)
     {
-      await JSRuntime.InvokeVoidAsync("SetFocusToElement", _configurePizzaDialog);
+      await _configurePizzaDialog.FocusAsync();
     }
   }
 
