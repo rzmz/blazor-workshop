@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace BlazingPizza;
-
-public class Order
+namespace BlazingPizza
 {
+  public class Order
+  {
     public int OrderId { get; set; }
 
     public string UserId { get; set; }
@@ -19,14 +19,17 @@ public class Order
     public decimal GetTotalPrice() => Pizzas.Sum(p => p.GetTotalPrice());
 
     public string GetFormattedTotalPrice() => GetTotalPrice().ToString("0.00");
-}
+  }
 
-[JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Default, PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
-[JsonSerializable(typeof(Order))]
-[JsonSerializable(typeof(OrderWithStatus))]
-[JsonSerializable(typeof(List<OrderWithStatus>))]
-[JsonSerializable(typeof(Pizza))]
-[JsonSerializable(typeof(List<PizzaSpecial>))]
-[JsonSerializable(typeof(List<Topping>))]
-[JsonSerializable(typeof(Topping))]
-public partial class OrderContext : JsonSerializerContext { }
+  [JsonSourceGenerationOptions(
+    GenerationMode = JsonSourceGenerationMode.Default,
+    PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase, WriteIndented = true)]
+  [JsonSerializable(typeof(Order))]
+  [JsonSerializable(typeof(OrderWithStatus))]
+  [JsonSerializable(typeof(List<OrderWithStatus>))]
+  [JsonSerializable(typeof(Pizza))]
+  [JsonSerializable(typeof(List<PizzaSpecial>))]
+  [JsonSerializable(typeof(List<Topping>))]
+  [JsonSerializable(typeof(Topping))]
+  public partial class OrderContext : JsonSerializerContext { }
+}
