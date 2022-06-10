@@ -3,20 +3,20 @@
 
 <div class="main">
     <ul class="pizza-cards">
-        @foreach (var special in specials)
-        {
-            <li @onclick="@(()=> ShowConfigurePizzaDialog(special))" style="background-image: url('@special.ImageUrl')">
-                <div class="pizza-info">
-                    <span class="title">
-                        @special.Name
-                    </span>
-                    @special.Description
-                    <span class="price">
-                        @special.GetFormattedBasePrice()
-                    </span>
-                </div>
-            </li>
-        }
+      @foreach (var special in specials)
+      {
+          <li @onclick="@(()=> ShowConfigurePizzaDialog(special))" style="background-image: url('@special.ImageUrl')">
+              <div class="pizza-info">
+                  <span class="title">
+                      @special.Name
+                  </span>
+                  @special.Description
+                  <span class="price">
+                      @special.GetFormattedBasePrice()
+                  </span>
+              </div>
+          </li>
+      }
     </ul>
 </div>
 
@@ -26,7 +26,7 @@
 }
 
 @code {
-    List<PizzaSpecial> specials;
+    List<PizzaSpecial> specials = new();
     Pizza configuringPizza;
     bool showingConfigureDialog;
 
