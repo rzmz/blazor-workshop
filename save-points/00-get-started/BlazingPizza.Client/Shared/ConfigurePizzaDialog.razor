@@ -16,18 +16,42 @@
             </div>
             <div>
                 <label>Extra toppings:</label>
-                @if(toppings == null)
+                @if (toppings == null)
                 {
-                    <select class="custom-select" @onchange="ToppingSelected">
-                        
+                    <select class="custom-select" disabled>
+                      <option>(loading...)</option>
                     </select>
+                }
+                else if (Pizza.Toppings.Count >= 6)
+                {
+                  <div>(maximum reached)</div>
+                }
+                else
+                {
+                  <select class="custom-select" @onchange="@ToppingSelected">
+                    <option value="-1" disabled selected>(none)</option>
+                    @foreach (var topping in toppings)
+                    {
+                      <option value="@topping.Id">@topping.Name - (£@(topping.GetFormattedPrice()))</option>
+                    }
+                  </select>
+                }
+            </div>
+            <div class="toppings">
+                @foreach (var topping in Pizza.Toppings)
+                {
+                    <div class="topping">
+                        <span>@topping.Topping.Name</span>
+                        <span class="topping-price">£@(topping.Topping.GetFormattedPrice())</span>
+                        <button type="button" class="delete-topping" @onclick="@(() => RemoveTopping(topping.Topping))">x</button>
+                    </div>
                 }
             </div>
         </form>
         <div class="dialog-buttons">
             <button class="btn btn-secondary mr-auto">Cancel</button>
             <span class="mr-center">
-                Price: 
+                Price:
                 <span class="price">@Pizza.GetFormattedTotalPrice()</span>
             </span>
             <button class="btn btn-success ml-auto">Order</button>
@@ -36,28 +60,34 @@
 </div>
 
 @code {
-    List<Topping> toppings;
-    [Parameter] public Pizza Pizza { get; set; }
+  List<Topping> toppings;
+  [Parameter] public Pizza Pizza { get; set; }
+  protected async override Task OnInitializedAsync()
+  {
+    toppings = await Http.GetFromJsonAsync<List<Topping>>("toppings");
+  }
 
-    protected async override Task OnInitializedAsync()
+  void ToppingSelected(ChangeEventArgs e)
+  {
+      if (int.TryParse((string)e.Value, out var index) && index >= 0)
+      {
+        var topping = toppings.Find(t => t.Id == index);
+        Console.WriteLine("Adding topping: " + topping.Id + topping.Name);
+        AddTopping(topping);
+      }
+  }
+
+  void AddTopping(Topping topping)
+  {
+    // do not allow selecting same topping twice
+    if (Pizza.Toppings.Find(pt => pt.Topping.Id == topping.Id) == null)
     {
-        toppings = await Http.GetFromJsonAsync<List<Topping>>("toppings");
+        Pizza.Toppings.Add(new PizzaTopping() { Topping = topping });
     }
+  }
 
-    void ToppingSelected(ChangeEventArgs e)
-    {
-        if (int.TryParse((string)e.Value, out var index) && index >= 0)
-        {
-            AddTopping(toppings[index]);
-        }
-    }
-
-    void AddTopping(Topping topping)
-    {
-        if (Pizza.Toppings.Find(pt => pt.Topping == topping) == null)
-        {
-            Pizza.Toppings.Add(new PizzaTopping() { Topping = topping });
-        }
-    }
-
+  void RemoveTopping(Topping topping)
+  {
+    Pizza.Toppings.RemoveAll(pt => pt.Topping == topping);
+  }
 }
