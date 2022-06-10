@@ -1,6 +1,7 @@
 ﻿@inject HttpClient Http
+@inject IJSRuntime JSRuntime
 
-<div class="dialog-container">
+<div class="dialog-container" tabindex="0" @onkeydown="KeyDown" @ref="_configurePizzaDialog">
     <div class="dialog">
         <div class="dialog-title">
             <h2>@Pizza.Special.Name</h2>
@@ -49,12 +50,12 @@
             </div>
         </form>
         <div class="dialog-buttons">
-            <button class="btn btn-secondary mr-auto">Cancel</button>
+            <button class="btn btn-secondary mr-auto" @onclick="OnCancel">Cancel</button>
             <span class="mr-center">
                 Price:
                 <span class="price">@Pizza.GetFormattedTotalPrice()</span>
             </span>
-            <button class="btn btn-success ml-auto">Order</button>
+            <button class="btn btn-success ml-auto" @onclick="OnConfirm">Order ></button>
         </div>
     </div>
 </div>
@@ -62,9 +63,20 @@
 @code {
   List<Topping> toppings;
   [Parameter] public Pizza Pizza { get; set; }
+  [Parameter] public EventCallback OnCancel { get; set; }
+  [Parameter] public EventCallback OnConfirm { get; set; }
+
+  protected ElementReference _configurePizzaDialog;
   protected async override Task OnInitializedAsync()
   {
     toppings = await Http.GetFromJsonAsync<List<Topping>>("toppings");
+  }
+  protected async override Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      await JSRuntime.InvokeVoidAsync("SetFocusToElement", _configurePizzaDialog);
+    }
   }
 
   void ToppingSelected(ChangeEventArgs e)
@@ -72,7 +84,6 @@
       if (int.TryParse((string)e.Value, out var index) && index >= 0)
       {
         var topping = toppings.Find(t => t.Id == index);
-        Console.WriteLine("Adding topping: " + topping.Id + topping.Name);
         AddTopping(topping);
       }
   }
@@ -89,5 +100,13 @@
   void RemoveTopping(Topping topping)
   {
     Pizza.Toppings.RemoveAll(pt => pt.Topping == topping);
+  }
+
+  void KeyDown(KeyboardEventArgs e)
+  {
+    if (e.Key == "Escape")
+    {
+      OnCancel.InvokeAsync(null);
+    }
   }
 }

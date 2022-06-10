@@ -22,13 +22,14 @@
 
 @if (showingConfigureDialog)
 {
-    <ConfigurePizzaDialog Pizza="configuringPizza" />
+    <ConfigurePizzaDialog Pizza="configuringPizza" OnCancel="CancelConfigurePizzaDialog" OnConfirm="ConfirmConfigurePizzaDialog" />
 }
 
 @code {
     List<PizzaSpecial> specials = new();
     Pizza configuringPizza;
     bool showingConfigureDialog;
+    Order order = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,5 +50,18 @@
             };
 
         showingConfigureDialog = true;
+    }
+
+    void CancelConfigurePizzaDialog()
+    {
+      configuringPizza = null;
+      showingConfigureDialog = false;
+    }
+
+    void ConfirmConfigurePizzaDialog()
+    {
+        order.Pizzas.Add(configuringPizza);
+        configuringPizza = null;
+        showingConfigureDialog = false;
     }
 }
