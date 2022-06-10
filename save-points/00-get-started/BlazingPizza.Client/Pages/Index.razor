@@ -23,25 +23,30 @@
 <div class="sidebar">
     @if (_order.Pizzas.Any())
     {
-        <div class="order-contents">
-            <h2>Your order</h2>
-            @foreach (var configuredPizza in _order.Pizzas)
-            {
-                <ConfiguredPizzaItem Pizza="configuredPizza" OnRemoved="@(() => RemoveConfiguredPizza(configuredPizza))" />
-            }
-        </div>
+      <div class="order-contents">
+        <h2>Your order</h2>
+        @foreach (var configuredPizza in _order.Pizzas)
+        {
+          <ConfiguredPizzaItem Pizza="configuredPizza" OnRemoved="@(() => RemoveConfiguredPizza(configuredPizza))" />
+        }
+      </div>
+      <div class="order-total">
+        Totals:
+        <span class="total-price">@_order.GetFormattedTotalPrice()</span>
+        <button class="btn btn-warning" @onclick="PlaceOrder">Order</button>
+      </div>
     }
     else
     {
         <div class="empty-cart">
-            Choose a pizza<br /> to get started
+          Choose a pizza<br /> to get started
         </div>
     }
 </div>
 
 @if (_showingConfigureDialog)
 {
-    <ConfigurePizzaDialog Pizza="configuringPizza" OnCancel="CancelConfigurePizzaDialog" OnConfirm="ConfirmConfigurePizzaDialog" />
+    <ConfigurePizzaDialog Pizza="_configuringPizza" OnCancel="@CancelConfigurePizzaDialog" OnConfirm="@ConfirmConfigurePizzaDialog" />
 }
 
 @code {
@@ -55,7 +60,7 @@
         // The /specials API is defined by a minimal API at PizzaApiExtensions.cs in the BlazingPizza.Server project.
         // BlazingPizza.OrderContext.Default.ListPizzaSpecial refers to Json serialization with source generators.
         // See here: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-source-generation
-        _specials = await Http.GetFromJsonAsync<List<PizzaSpecial>>("specials", BlazingPizza.OrderContext.Default.ListPizzaSpecial);
+        _specials = await Http.GetFromJsonAsync("specials", OrderContext.Default.ListPizzaSpecial);
     }
 
     void ShowConfigurePizzaDialog(PizzaSpecial special)
@@ -88,4 +93,9 @@
     {
         _order.Pizzas.Remove(pizza);
     }
+
+  async Task PlaceOrder()
+  {
+    await Http.PostAsJsonAsync("orders", _order);
+  }
 }
