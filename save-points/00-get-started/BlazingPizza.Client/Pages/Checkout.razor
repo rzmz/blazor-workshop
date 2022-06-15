@@ -20,7 +20,7 @@
         </h4>
       </div>
     </div>
-    <button class="checkout-button btn btn-warning" type="submit">
+    <button class="checkout-button btn btn-warning" type="submit" disabled="@_isSubmitting">
       Place order
     </button>
     <DataAnnotationsValidator />
@@ -29,12 +29,17 @@
 </div>
 
 @code {
+
+  bool _isSubmitting = false;
   
   async Task PlaceOrder()
   {
+    _isSubmitting = true;
+    await Task.Delay(5000);
     var response = await HttpClient.PostAsJsonAsync("orders", OrderState.Order);
     var newOrderId = await response.Content.ReadFromJsonAsync<int>();
     OrderState.ResetOrder();
+    _isSubmitting = false;
     NavigationManager.NavigateTo($"myorders/{newOrderId}");
   }
 }
