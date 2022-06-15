@@ -1,5 +1,6 @@
 @page "/MyOrders"
 @inject HttpClient Http
+@using BlazingPizza.Client.Shared.Components
 
 <PageTitle>Blazing Pizza - My Orders</PageTitle>
 
@@ -16,16 +17,16 @@
   else
   {
     <div class="list-group orders-list">
-        @foreach (var item in _ordersWithStatus)
-        {
-          <OrderPanel Item="item" />
-        }
+      @foreach (var item in _ordersWithStatus)
+      {
+        <OrderPanel Item="@item"/>
+      }
     </div>
   }
 </div>
 
 @code {
-  IEnumerable<BlazingPizza.OrderWithStatus> _ordersWithStatus;
+  IEnumerable<OrderWithStatus> _ordersWithStatus;
 
   protected override async Task OnParametersSetAsync()
   {
