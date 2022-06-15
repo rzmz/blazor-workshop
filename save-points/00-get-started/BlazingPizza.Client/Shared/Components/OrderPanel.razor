@@ -3,7 +3,7 @@
     <h5>@Item.Order.CreatedTime.ToLongDateString()</h5>
     Items:
     <strong>@Item.Order.Pizzas.Count()</strong>;
-    Total price: 
+    Total price:
     <strong>£@Item.Order.GetFormattedTotalPrice()</strong>
   </div>
   <div class="col">
@@ -16,7 +16,8 @@
   </div>
 </div>
 
-@code 
+@code
 {
-  [Parameter] public OrderWithStatus Item { get; set; }
+  [Parameter]
+  public OrderWithStatus Item { get; set; }
 }

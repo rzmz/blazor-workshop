@@ -1,101 +1,105 @@
 ﻿@page "/"
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
 
 <div class="main">
-    <ul class="pizza-cards">
-        @foreach (var special in _specials)
-        {
-            <li @onclick="@(()=> ShowConfigurePizzaDialog(special))" style="background-image: url('@special.ImageUrl')">
-                <div class="pizza-info">
-                    <span class="title">
-                        @special.Name
-                    </span>
-                    @special.Description
-                    <span class="price">
-                        @special.GetFormattedBasePrice()
-                    </span>
-                </div>
-            </li>
-        }
-    </ul>
+  <ul class="pizza-cards">
+    @foreach (var special in _specials)
+    {
+      <li @onclick="@(() => ShowConfigurePizzaDialog(special))" style="background-image: url('@special.ImageUrl')">
+        <div class="pizza-info">
+          <span class="title">
+            @special.Name
+          </span>
+          @special.Description
+          <span class="price">
+            @special.GetFormattedBasePrice()
+          </span>
+        </div>
+      </li>
+    }
+  </ul>
 </div>
 
 <div class="sidebar">
-    @if (_order.Pizzas.Any())
-    {
-      <div class="order-contents">
-        <h2>Your order</h2>
-        @foreach (var configuredPizza in _order.Pizzas)
-        {
-          <ConfiguredPizzaItem Pizza="configuredPizza" OnRemoved="@(() => RemoveConfiguredPizza(configuredPizza))" />
-        }
-      </div>
-      <div class="order-total">
-        Totals:
-        <span class="total-price">@_order.GetFormattedTotalPrice()</span>
-        <button class="btn btn-warning" @onclick="PlaceOrder">Order</button>
-      </div>
-    }
-    else
-    {
-        <div class="empty-cart">
-          Choose a pizza<br /> to get started
-        </div>
-    }
+  @if (_order.Pizzas.Any())
+  {
+    <div class="order-contents">
+      <h2>Your order</h2>
+      @foreach (var configuredPizza in _order.Pizzas)
+      {
+        <ConfiguredPizzaItem Pizza="configuredPizza" OnRemoved="@(() => RemoveConfiguredPizza(configuredPizza))"/>
+      }
+    </div>
+    <div class="order-total">
+      Totals:
+      <span class="total-price">@_order.GetFormattedTotalPrice()</span>
+      <button class="btn btn-warning" @onclick="PlaceOrder">Order</button>
+    </div>
+  }
+  else
+  {
+    <div class="empty-cart">
+      Choose a pizza<br/> to get started
+    </div>
+  }
 </div>
 
 @if (_showingConfigureDialog)
 {
-    <ConfigurePizzaDialog Pizza="_configuringPizza" OnCancel="@CancelConfigurePizzaDialog" OnConfirm="@ConfirmConfigurePizzaDialog" />
+  <ConfigurePizzaDialog Pizza="_configuringPizza" OnCancel="@CancelConfigurePizzaDialog" OnConfirm="@ConfirmConfigurePizzaDialog"/>
 }
 
 @code {
-    List<PizzaSpecial> _specials = new();
-    Pizza _configuringPizza;
-    bool _showingConfigureDialog;
-    Order _order = new();
+  List<PizzaSpecial> _specials = new();
+  Pizza _configuringPizza;
+  bool _showingConfigureDialog;
+  readonly Order _order = new();
 
-    protected override async Task OnInitializedAsync()
+  protected override async Task OnInitializedAsync()
+  {
+  // The /specials API is defined by a minimal API at PizzaApiExtensions.cs in the BlazingPizza.Server project.
+  // BlazingPizza.OrderContext.Default.ListPizzaSpecial refers to Json serialization with source generators.
+  // See here: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-source-generation
+    _specials = await Http.GetFromJsonAsync("specials", OrderContext.Default.ListPizzaSpecial);
+  }
+
+  void ShowConfigurePizzaDialog(PizzaSpecial special)
+  {
+    _configuringPizza = new Pizza
     {
-        // The /specials API is defined by a minimal API at PizzaApiExtensions.cs in the BlazingPizza.Server project.
-        // BlazingPizza.OrderContext.Default.ListPizzaSpecial refers to Json serialization with source generators.
-        // See here: https://docs.microsoft.com/en-us/dotnet/standard/serialization/system-text-json-source-generation
-        _specials = await Http.GetFromJsonAsync("specials", OrderContext.Default.ListPizzaSpecial);
-    }
+      Special = special,
+      SpecialId = special.Id,
+      Size = Pizza.DefaultSize,
+      Toppings = new List<PizzaTopping>()
+    };
 
-    void ShowConfigurePizzaDialog(PizzaSpecial special)
-    {
-        _configuringPizza = new Pizza()
-        {
-            Special = special,
-            SpecialId = special.Id,
-            Size = Pizza.DefaultSize,
-            Toppings = new List<PizzaTopping>(),
-        };
+    _showingConfigureDialog = true;
+  }
 
-        _showingConfigureDialog = true;
-    }
+  void CancelConfigurePizzaDialog()
+  {
+    _configuringPizza = null;
+    _showingConfigureDialog = false;
+  }
 
-    void CancelConfigurePizzaDialog()
-    {
-        _configuringPizza = null;
-        _showingConfigureDialog = false;
-    }
+  void ConfirmConfigurePizzaDialog()
+  {
+    _order.Pizzas.Add(_configuringPizza);
+    _configuringPizza = null;
+    _showingConfigureDialog = false;
+  }
 
-    void ConfirmConfigurePizzaDialog()
-    {
-        _order.Pizzas.Add(_configuringPizza);
-        _configuringPizza = null;
-        _showingConfigureDialog = false;
-    }
-
-    void RemoveConfiguredPizza(Pizza pizza)
-    {
-        _order.Pizzas.Remove(pizza);
-    }
+  void RemoveConfiguredPizza(Pizza pizza)
+  {
+    _order.Pizzas.Remove(pizza);
+  }
 
   async Task PlaceOrder()
   {
-    await Http.PostAsJsonAsync("orders", _order);
+    var response = await Http.PostAsJsonAsync("orders", _order);
+    var newOrderId = await response.Content.ReadFromJsonAsync<int>();
+    NavigationManager.NavigateTo($"myorders/{newOrderId}");
   }
+
 }

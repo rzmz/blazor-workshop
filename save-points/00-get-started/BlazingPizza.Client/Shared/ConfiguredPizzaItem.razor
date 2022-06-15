@@ -4,7 +4,7 @@
     @(Pizza.Size) @(Pizza.Special.Name)
   </div>
   <ul>
-    @foreach(var topping in Pizza.Toppings)
+    @foreach (var topping in Pizza.Toppings)
     {
       <li>+ @(topping.Topping.Name)</li>
     }
@@ -17,6 +17,9 @@
 
 @code
 {
-  [Parameter] public Pizza Pizza { get; set; }
-  [Parameter] public EventCallback OnRemoved { get; set; }
+  [Parameter]
+  public Pizza Pizza { get; set; }
+
+  [Parameter]
+  public EventCallback OnRemoved { get; set; }
 }

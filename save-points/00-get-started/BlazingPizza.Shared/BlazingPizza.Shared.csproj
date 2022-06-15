@@ -3,15 +3,15 @@
   <PropertyGroup>
     <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
     <RootNamespace>BlazingPizza</RootNamespace>
-		<ImplicitUsings>true</ImplicitUsings>
+    <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
-	<ItemGroup>
-		<Using Include="System.ComponentModel.DataAnnotations" />
-	</ItemGroup>
-	
   <ItemGroup>
-    <ProjectReference Include="..\BlazingPizza.ComponentsLibrary\BlazingPizza.ComponentsLibrary.csproj" />
+    <Using Include="System.ComponentModel.DataAnnotations"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BlazingPizza.ComponentsLibrary\BlazingPizza.ComponentsLibrary.csproj"/>
   </ItemGroup>
 
 </Project>

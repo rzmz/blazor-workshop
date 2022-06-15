@@ -1,6 +1,7 @@
 @page "/myorders/{orderId:int}"
-@using System.Threading
 @inject HttpClient HttpClient
+@using BlazingPizza.Client.Shared.Components
+@implements IDisposable
 
 <div class="main">
   @if (_invalidOrder)
@@ -24,14 +25,18 @@
         </p>
       </div>
       <div class="track-order-body">
-        TODO: show more details
+        <div class="track-order-details">
+          <OrderReview Order="_orderWithStatus.Order"/>
+        </div>
       </div>
     </div>
   }
 </div>
 
-@code { 
-  [Parameter] public int OrderId { get; set; }
+@code {
+
+  [Parameter]
+  public int OrderId { get; set; }
 
   OrderWithStatus _orderWithStatus;
   bool _invalidOrder;
@@ -39,10 +44,10 @@
 
   protected override void OnParametersSet()
   {
-    // If we were already polling for a different order, stop doing so.
+  // If we were already polling for a different order, stop doing so.
     _pollingCancellationToken?.Cancel();
-    
-    // Start a new poll loop
+
+  // Start a new poll loop
     PollForUpdates();
   }
 
@@ -75,4 +80,10 @@
       }
     }
   }
+
+  public void Dispose()
+  {
+    _pollingCancellationToken?.Cancel();
+  }
+
 }
