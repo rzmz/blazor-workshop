@@ -15,12 +15,17 @@
   }
   else
   {
-    <div>TODO: show orders</div>
+    <div class="list-group orders-list">
+        @foreach (var item in _ordersWithStatus)
+        {
+          <OrderPanel Item="item" />
+        }
+    </div>
   }
 </div>
 
 @code {
-  IEnumerable<OrderWithStatus> _ordersWithStatus;
+  IEnumerable<BlazingPizza.OrderWithStatus> _ordersWithStatus;
 
   protected override async Task OnParametersSetAsync()
   {

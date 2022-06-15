@@ -1,0 +1,22 @@
+<div class="list-group-item">
+  <div class="col">
+    <h5>@Item.Order.CreatedTime.ToLongDateString()</h5>
+    Items:
+    <strong>@Item.Order.Pizzas.Count()</strong>;
+    Total price: 
+    <strong>£@Item.Order.GetFormattedTotalPrice()</strong>
+  </div>
+  <div class="col">
+    Status: <strong>@Item.StatusText</strong>
+  </div>
+  <div class="col flex-grow-0">
+    <a href="myorders/@Item.Order.OrderId" class="btn btn-success">
+      Track >
+    </a>
+  </div>
+</div>
+
+@code 
+{
+  [Parameter] public OrderWithStatus Item { get; set; }
+}
