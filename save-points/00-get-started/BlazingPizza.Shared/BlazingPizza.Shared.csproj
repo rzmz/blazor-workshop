@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Using Include="System.ComponentModel.DataAnnotations"/>
+    <Using Include="System.ComponentModel.DataAnnotations" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazingPizza.ComponentsLibrary\BlazingPizza.ComponentsLibrary.csproj"/>
+    <ProjectReference Include="..\BlazingPizza.ComponentsLibrary\BlazingPizza.ComponentsLibrary.csproj" />
   </ItemGroup>
 
 </Project>
