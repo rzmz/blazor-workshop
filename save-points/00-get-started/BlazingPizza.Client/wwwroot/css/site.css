@@ -702,7 +702,8 @@ input[type=range]::-ms-thumb {
 }
 
 .form-field > label {
-  width: 8rem;
+  width: 10rem;
+  white-space: nowrap;
 }
 
 .form-field > div {
